@@ -1,16 +1,21 @@
-body {
-  overflow: hidden;
-  user-select: none;
-  /* stuff that sass won't compile to */
-  -webkit-touch-callout: none;
-  -khtml-user-select: none;
-}
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
-
-}
-
+html, body {
+    overflow: hidden;
+    user-select: none;
+  
+    /* stuff that sass won't compile to */
+    -webkit-touch-callout: none;
+    -khtml-user-select: none;
+       width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+  
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+ 
+  }
+  

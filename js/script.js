@@ -2,26 +2,23 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const pi = Math.PI;
 
-// background gradient
-const backgroundImage = new Image();
+const image = new Image();
+image.src = "image/farm.png";
+image.onload = function() {
+    renderLoop(); 
+    fixDpiResizeCanvas()
+};
+
 let gradient;
 
-function fixDpiResizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+function fixDpiResizeCanvas() {  
+    canvas.width = window.innerWidth ;
+    canvas.height = window.innerHeight;
+    // ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     gradient = ctx.createLinearGradient(0, canvas.width, canvas.height, 0);
     gradient.addColorStop(0, "#D9BBA0");
     gradient.addColorStop(1, "#5B3A29");
-
-    backgroundImage.src = "image/farm.png";
-    backgroundImage.onload = function () {
-        ctx.drawImage(backgroundImage, canvas.width, canvas.height);
-    };
 }
 fixDpiResizeCanvas();
 window.addEventListener("resize", fixDpiResizeCanvas);
@@ -53,7 +50,6 @@ function touchMove(x, y) {
         positions.innerX - positions.fixedX
     );
 
-    // If inner circle is outside joystick radius, reduce it to the circumference
     if (!((x - positions.fixedX) ** 2 + (y - positions.fixedY) ** 2 < 10000)) {
         positions.innerX = Math.round(Math.cos(angle) * 100 + positions.fixedX);
         positions.innerY = Math.round(Math.sin(angle) * 100 + positions.fixedY);
@@ -95,37 +91,36 @@ function renderLoop() {
     requestAnimationFrame(renderLoop);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    //Rita bakgrundsfärgen
-    if(gradient){
+    // Rita bakgrundsfärgen
+    if (gradient) {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    //Rita bakgrundsbilden
-    if (backgroundImage.complete) {
+    // Rita bakgrundsbilden
+    if (image.complete) {
 
-        const imgWidth = 800;
-        const imgHeight = 800;
+        const imageWidth = image.width;  
+        const imageHeight = image.height;
+        const imageScaleFactor = 2; 
 
-        const centX = (canvas.width - imgWidth) / 2;
-        const centY = (canvas.height - imgHeight) / 2;
+        const x = (canvas.width - imageWidth * imageScaleFactor) / 2; 
+        const y = (canvas.height - imageHeight * imageScaleFactor) / 2;
 
-        ctx.drawImage(backgroundImage, centX, centY, imgWidth, imgHeight);
+        ctx.drawImage(image, x, y, imageWidth * imageScaleFactor, imageHeight * imageScaleFactor);
     }
-    // Invert Y axis and turn into positive
+
     var displayAngle = (-angle + 2 * pi) % (2 * pi);
 
     ctx.fillStyle = "#0008";
-    // Draw other message if not touching screen
+
     if (!(positions.fixedX || positions.fixedY)) {
         ctx.fillText("Touch the screen", 20, 20);
         return;
     }
 
-    // Display data
     ctx.fillText(
-        `Angle: ${Math.round((displayAngle * 180) / pi)} degrees (${Math.round(displayAngle * 100) / 100
-        } radians)`,
+        `Angle: ${Math.round((displayAngle * 180) / pi)} degrees (${Math.round(displayAngle * 100) / 100} radians)`,
         20,
         20
     );
@@ -141,8 +136,7 @@ function renderLoop() {
         80
     );
     ctx.fillText(
-        `Touch start point: (${positions.fixedX},${positions.fixedY}) or (${Math.round((positions.fixedX / window.innerWidth) * 1000) / 1000
-        },${Math.round((positions.fixedY / window.innerHeight) * 1000) / 1000})`,
+        `Touch start point: (${positions.fixedX},${positions.fixedY}) or (${Math.round((positions.fixedX / window.innerWidth) * 1000) / 1000},${Math.round((positions.fixedY / window.innerHeight) * 1000) / 1000})`,
         20,
         110
     );
@@ -162,36 +156,9 @@ function renderLoop() {
     ctx.closePath();
 }
 
+
+
 renderLoop();
 
 ctx.font = "20px Helvetica";
 ctx.textBaseline = "top";
-
-/*var keys = {37: 1, 38: 1, 39: 1, 40: 1};
-
-function preventDefault(e) {
-  e.preventDefault();
-}
-
-function preventDefaultForScrollKeys(e) {
-  if (keys[e.keyCode]) {
-    preventDefault(e);
-    return false;
-  }
-}
-
-// modern Chrome requires { passive: false } when adding event
-var supportsPassive = false;
-try {
-  window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
-    get: function () { supportsPassive = true; } 
-  }));
-} catch(e) {}
-
-var wheelOpt = supportsPassive ? { passive: false } : false;
-var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
-
-window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
-window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
-window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
-window.addEventListener('keydown', preventDefaultForScrollKeys, false);*/
